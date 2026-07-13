@@ -1,0 +1,21 @@
+# 3m_tool — Git ignore
+
+# .NET
+**/bin/
+**/obj/
+*.user
+
+# VS / VS Code
+.vs/
+.vscode/
+
+# Logs
+*.log
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Misc
+chat.json
+App1.slnx

@@ -1,0 +1,3 @@
+[submodule "3m_core"]
+	path = 3m_core
+	url = ./3m_core
