@@ -19,3 +19,7 @@ Desktop.ini
 # Misc
 chat.json
 App1.slnx
+build/
+*.zip
+BundleArtifacts/
+3m_gui_1.0.0.0_Test/

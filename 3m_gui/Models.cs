@@ -8,7 +8,7 @@ namespace MosaicMKVMuxer;
 
 // ── 数据绑定模型 ──────────────────────────────────────────────────
 
-public class EpisodeDisplay : INotifyPropertyChanged
+public partial class EpisodeDisplay : INotifyPropertyChanged
 {
     private bool _selected = true;
     public string Name { get; set; } = "";

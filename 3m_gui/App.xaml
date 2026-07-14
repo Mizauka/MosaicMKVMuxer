@@ -10,20 +10,80 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- 窗口控制按钮样式（─ □） -->
+            <!-- 窗口控制按钮样式 -->
             <Style x:Key="WindowControlButtonStyle" TargetType="Button">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="Padding" Value="0"/>
+                <Setter Property="UseSystemFocusVisuals" Value="False"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid x:Name="Root" Background="{TemplateBinding Background}">
+                                <ContentPresenter x:Name="ContentPresenter"
+                                    Content="{TemplateBinding Content}"
+                                    FontFamily="{TemplateBinding FontFamily}"
+                                    FontSize="{TemplateBinding FontSize}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"/>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal"/>
+                                        <VisualState x:Name="PointerOver">
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)"
+                                                    To="#1AFFFFFF" Duration="0:0:0.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)"
+                                                    To="#30FFFFFF" Duration="0:0:0.05"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
-            <!-- 窗口关闭按钮样式（✕） -->
-            <Style x:Key="WindowControlCloseButtonStyle" TargetType="Button">
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="Foreground" Value="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Padding" Value="0"/>
+            <!-- 窗口关闭按钮样式 -->
+            <Style x:Key="WindowControlCloseButtonStyle" TargetType="Button"
+                   BasedOn="{StaticResource WindowControlButtonStyle}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid x:Name="Root" Background="{TemplateBinding Background}">
+                                <ContentPresenter x:Name="ContentPresenter"
+                                    Content="{TemplateBinding Content}"
+                                    FontFamily="{TemplateBinding FontFamily}"
+                                    FontSize="{TemplateBinding FontSize}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"/>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal"/>
+                                        <VisualState x:Name="PointerOver">
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)"
+                                                    To="#E81123" Duration="0:0:0.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <Storyboard>
+                                                <ColorAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)"
+                                                    To="#BF0F1A" Duration="0:0:0.05"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

@@ -50,6 +50,9 @@ public static class Logger
         // 1. VS 调试输出
         Debug.WriteLine($"[3m] {line}");
 
+        // 2. Debug 控制台
+        Console.WriteLine($"[3m] {line}");
+
         // 2. 写入日志文件
         lock (_lock)
         {

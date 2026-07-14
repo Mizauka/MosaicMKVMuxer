@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType Condition="'$(Configuration)'=='Debug'">Exe</OutputType>
+    <OutputType Condition="'$(Configuration)'!='Debug'">WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>MosaicMKVMuxer</RootNamespace>
@@ -11,17 +12,55 @@
     <UseWinUI>true</UseWinUI>
     <WinUISDKReferences>false</WinUISDKReferences>
     <EnableMsixTooling>true</EnableMsixTooling>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
-
   <ItemGroup>
+    <Content Remove="Assets\MediumTile.scale-100.png" />
+    <Content Remove="Assets\MediumTile.scale-125.png" />
+    <Content Remove="Assets\MediumTile.scale-150.png" />
+    <Content Remove="Assets\MediumTile.scale-200.png" />
+    <Content Remove="Assets\MediumTile.scale-400.png" />
+    <Content Remove="Assets\SplashScreen.scale-100.png" />
+    <Content Remove="Assets\SplashScreen.scale-125.png" />
+    <Content Remove="Assets\SplashScreen.scale-150.png" />
+    <Content Remove="Assets\SplashScreen.scale-400.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-24.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-256.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-32.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-lightunplated_targetsize-48.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-16.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-256.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-32.png" />
+    <Content Remove="Assets\Square44x44Logo.altform-unplated_targetsize-48.png" />
+    <Content Remove="Assets\Square44x44Logo.scale-100.png" />
+    <Content Remove="Assets\Square44x44Logo.scale-125.png" />
+    <Content Remove="Assets\Square44x44Logo.scale-150.png" />
+    <Content Remove="Assets\Square44x44Logo.scale-400.png" />
+    <Content Remove="Assets\Square44x44Logo.targetsize-16.png" />
+    <Content Remove="Assets\Square44x44Logo.targetsize-24.png" />
+    <Content Remove="Assets\Square44x44Logo.targetsize-256.png" />
+    <Content Remove="Assets\Square44x44Logo.targetsize-32.png" />
+    <Content Remove="Assets\Square44x44Logo.targetsize-48.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-100.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-125.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-150.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-400.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\app.ico" />
+    <Content Include="Assets\app.png" />
+    <Content Include="Assets\icon.svg" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
     <Content Include="Assets\Square44x44Logo.scale-200.png" />
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="Assets\tray.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +72,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.1.2" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2270" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
   </ItemGroup>
@@ -48,11 +88,7 @@
 
   <!-- 构建后从 Rust 项目复制 m3_core.exe -->
   <Target Name="CopyRustBackend" AfterTargets="Build">
-    <Copy SourceFiles="..\3m_core\target\release\m3_core.exe"
-          DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"
-          Condition="Exists('..\3m_core\target\release\m3_core.exe')" />
-    <Copy SourceFiles="..\3m_core\target\debug\m3_core.exe"
-          DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"
-          Condition="Exists('..\3m_core\target\debug\m3_core.exe') and !Exists('..\3m_core\target\release\m3_core.exe')" />
+    <Copy SourceFiles="..\3m_core\target\release\m3_core.exe" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('..\3m_core\target\release\m3_core.exe')" />
+    <Copy SourceFiles="..\3m_core\target\debug\m3_core.exe" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('..\3m_core\target\debug\m3_core.exe') and !Exists('..\3m_core\target\release\m3_core.exe')" />
   </Target>
 </Project>

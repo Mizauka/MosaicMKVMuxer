@@ -1,209 +1,1143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window
-    x:Class="MosaicMKVMuxer.MainWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:MosaicMKVMuxer"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
-    mc:Ignorable="d"
-    Title="3mtool — Mosaic MKV Muxer">
+<Window x:Class="MosaicMKVMuxer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+        xmlns:tb="using:H.NotifyIcon"
+        Title="Mosaic MKV Muxer">
 
     <Window.SystemBackdrop>
-        <MicaBackdrop />
+        <MicaBackdrop/>
     </Window.SystemBackdrop>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- ════════════════ 自定义标题栏 ════════════════ -->
-        <Grid x:Name="AppTitleBar" Grid.Row="0" Background="Transparent">
+        <!-- 标题栏 -->
+        <Grid x:Name="AppTitleBar"
+              Grid.Row="0"
+              Background="Transparent">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
-                <TextBlock Text="🎬" FontSize="14" VerticalAlignment="Center"/>
-                <TextBlock Text="  3mtool" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"
-                           Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
-                <TextBlock Text=" — Mosaic MKV Muxer" FontSize="11" VerticalAlignment="Center"
-                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" Margin="0,0,12,0"/>
-                <TextBlock x:Name="TitleBarStatus" Text="●" FontSize="10" VerticalAlignment="Center" Margin="4,0,0,0"
-                           Foreground="Gray" ToolTipService.ToolTip="后端状态"/>
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        Margin="12,0,0,0"
+                        VerticalAlignment="Center">
+                <Image x:Name="TitleBarIcon"
+                       Width="16"
+                        Height="16"
+                       Margin="0,0,8,0"
+                       VerticalAlignment="Center"/>
+                <TextBlock Text="Mosaic MKV Muxer"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                <TextBlock x:Name="TitleBarStatus"
+                           Text="●"
+                           FontSize="10"
+                           VerticalAlignment="Center"
+                           Margin="6,0,0,0"
+                           Foreground="Gray"/>
             </StackPanel>
-
-            <Border Grid.Column="1" x:Name="TitleBarDragRegion" Background="Transparent"/>
-
-            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Stretch">
-                <Button x:Name="BtnMinimize" Content="&#xE921;" Width="46" Height="32"
-                        FontFamily="Segoe MDL2 Assets" FontSize="10"
-                        Style="{StaticResource WindowControlButtonStyle}" Click="OnMinimizeClick"/>
-                <Button x:Name="BtnMaximize" Content="&#xE922;" Width="46" Height="32"
-                        FontFamily="Segoe MDL2 Assets" FontSize="10"
-                        Style="{StaticResource WindowControlButtonStyle}" Click="OnMaximizeRestoreClick"/>
-                <Button x:Name="BtnClose" Content="&#xE8BB;" Width="46" Height="32"
-                        FontFamily="Segoe MDL2 Assets" FontSize="10"
-                        Style="{StaticResource WindowControlCloseButtonStyle}" Click="OnCloseClick"/>
+            <Border Grid.Column="1"
+                    x:Name="TitleBarDragRegion"
+                    Background="Transparent"/>
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal">
+                <Button x:Name="BtnMinimize"
+                        Content="&#xE921;"
+                        Width="46"
+                        Height="32"
+                        FontFamily="Segoe MDL2 Assets"
+                        FontSize="10"
+                        UseSystemFocusVisuals="False"
+                        Style="{StaticResource WindowControlButtonStyle}"
+                        Click="OnMinimizeClick"/>
+                <Button x:Name="BtnMaximize"
+                        Content="&#xE922;"
+                        Width="46"
+                        Height="32"
+                        FontFamily="Segoe MDL2 Assets"
+                        FontSize="10"
+                        UseSystemFocusVisuals="False"
+                        Style="{StaticResource WindowControlButtonStyle}"
+                        Click="OnMaximizeRestoreClick"/>
+                <Button x:Name="BtnClose"
+                        Content="&#xE8BB;"
+                        Width="46"
+                        Height="32"
+                        FontFamily="Segoe MDL2 Assets"
+                        FontSize="10"
+                        UseSystemFocusVisuals="False"
+                        Style="{StaticResource WindowControlCloseButtonStyle}"
+                        Click="OnCloseClick"/>
             </StackPanel>
         </Grid>
 
-        <!-- ════════════════ NavigationView 侧栏 ════════════════ -->
-        <controls:NavigationView x:Name="NavView" Grid.Row="1"
-                                  PaneDisplayMode="LeftCompact"
-                                  IsBackButtonVisible="Collapsed"
-                                  IsSettingsVisible="False"
-                                  IsPaneToggleButtonVisible="True"
-                                  CompactPaneLength="48" OpenPaneLength="180"
-                                  SelectionChanged="OnNavSelectionChanged">
+        <!-- NavigationView -->
+        <controls:NavigationView x:Name="NavView"
+                                 Grid.Row="1"
+                                 PaneDisplayMode="LeftCompact"
+                                 IsSettingsVisible="False"
+                                 IsBackButtonVisible="Visible"
+                                 CompactPaneLength="48"
+                                 OpenPaneLength="160"
+                                 SelectionChanged="OnNavSelectionChanged"
+                                 BackRequested="OnNavBackRequested">
             <controls:NavigationView.MenuItems>
-                <controls:NavigationViewItem x:Name="NavTools" Content="工具" Tag="tools">
+                <controls:NavigationViewItem x:Name="NavHome"
+                                             Content="首页"
+                                             Tag="home">
                     <controls:NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Setting"/>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                Glyph="&#xE80F;"/>
                     </controls:NavigationViewItem.Icon>
                 </controls:NavigationViewItem>
-                <controls:NavigationViewItem x:Name="NavLogs" Content="日志" Tag="logs">
+                <controls:NavigationViewItem x:Name="NavWorkspace"
+                                             Content="工作区"
+                                             Tag="workspace">
                     <controls:NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Document"/>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                Glyph="&#xE8B7;"/>
+                    </controls:NavigationViewItem.Icon>
+                </controls:NavigationViewItem>
+                <controls:NavigationViewItemSeparator/>
+                <controls:NavigationViewItem x:Name="NavHelper"
+                                             Content="帮助"
+                                             Tag="helper">
+                    <controls:NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                Glyph="&#xE897;"/>
                     </controls:NavigationViewItem.Icon>
                 </controls:NavigationViewItem>
             </controls:NavigationView.MenuItems>
+            <controls:NavigationView.FooterMenuItems>
+                <controls:NavigationViewItem x:Name="NavLogs"
+                                             Content="日志"
+                                             Tag="logs">
+                    <controls:NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                Glyph="&#xE8A5;"/>
+                    </controls:NavigationViewItem.Icon>
+                </controls:NavigationViewItem>
+                <controls:NavigationViewItem x:Name="NavSettings"
+                                             Content="设置"
+                                             Tag="settings">
+                    <controls:NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                Glyph="&#xE713;"/>
+                    </controls:NavigationViewItem.Icon>
+                </controls:NavigationViewItem>
+            </controls:NavigationView.FooterMenuItems>
 
-            <!-- 页面容器 -->
             <Grid>
-            <!-- ── 工具页面 ── -->
-            <ScrollViewer x:Name="ToolsPage" VerticalScrollBarVisibility="Auto">
-                <StackPanel Margin="24,16,24,24" Spacing="16">
-
-                    <controls:Expander Header="🔧 工具路径设置" IsExpanded="True"
-                                       Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="6">
-                        <StackPanel Margin="16,8,16,16" Spacing="12">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="FFmpeg:" VerticalAlignment="Center" FontWeight="SemiBold"/>
-                                <TextBox x:Name="FFmpegPathBox" Grid.Column="1" PlaceholderText="FFmpeg 可执行文件路径..." Margin="8,0,8,0"/>
-                                <Button x:Name="BtnBrowseFFmpeg" Grid.Column="2" Content="📂" MinWidth="40" Click="OnBrowseFFmpeg"/>
-                                <Button x:Name="BtnDetectFFmpeg" Grid.Column="3" Content="🔍 自动检测" Margin="4,0,0,0" Click="OnDetectFFmpeg"/>
-                            </Grid>
-                            <TextBlock x:Name="FFmpegStatus" Margin="8,0,0,0" FontSize="11"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="7-Zip:" VerticalAlignment="Center" FontWeight="SemiBold"/>
-                                <TextBox x:Name="SevenZipPathBox" Grid.Column="1" PlaceholderText="7-Zip 路径..." Margin="8,0,8,0"/>
-                                <Button x:Name="BtnBrowse7z" Grid.Column="2" Content="📂" MinWidth="40" Click="OnBrowse7z"/>
-                                <Button x:Name="BtnDetect7z" Grid.Column="3" Content="🔍 自动检测" Margin="4,0,0,0" Click="OnDetect7z"/>
-                            </Grid>
-                            <TextBlock x:Name="SevenZipStatus" Margin="8,0,0,0" FontSize="11"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                <!-- ═══ 首页 ═══ -->
+                <Grid x:Name="HomePage"
+                      Visibility="Collapsed">
+                    <StackPanel VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Spacing="16"
+                                MaxWidth="500">
+                        <TextBlock Text="Mosaic MKV Muxer"
+                                   FontSize="28"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="HomeStatus"
+                                   Text="正在检测工具..."
+                                   FontSize="13"
+                                   HorizontalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   Margin="0,8"/>
+                        <StackPanel x:Name="HomeActions"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Spacing="12"
+                                    Visibility="Collapsed">
+                            <Button x:Name="BtnQuickOpen"
+                                    MinHeight="40"
+                                    MinWidth="160"
+                                    Click="OnQuickOpenWorkspace">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal"
+                                            Spacing="8">
+                                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                Glyph="&#xE8B7;"
+                                                  FontSize="16"/>
+                                        <TextBlock Text="打开工作区"
+                                                FontSize="14"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button x:Name="BtnGoSettings"
+                                    MinHeight="40"
+                                    MinWidth="120"
+                                    FontSize="14"
+                                    Click="OnGoSettings">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal"
+                                            Spacing="6">
+                                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                                  Glyph="&#xE713;"
+                                                FontSize="14"/>
+                                        <TextBlock Text="设置"
+                                                FontSize="14"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
                         </StackPanel>
-                    </controls:Expander>
-
-                    <controls:Expander Header="📁 工作区" IsExpanded="True"
-                                       Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="6">
-                        <StackPanel Margin="16,8,16,16" Spacing="12">
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <TextBlock Text="输入目录:" VerticalAlignment="Center" FontWeight="SemiBold"/>
-                                <TextBox x:Name="InputDirBox" Grid.Column="1" PlaceholderText="包含 MP4、M4A 的文件夹..." Margin="8,0,8,0"/>
-                                <Button x:Name="BtnBrowseInput" Grid.Column="2" Content="📂 浏览" Click="OnBrowseInput"/>
-                            </Grid>
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <TextBlock Text="输出目录:" VerticalAlignment="Center" FontWeight="SemiBold"/>
-                                <TextBox x:Name="OutputDirBox" Grid.Column="1" PlaceholderText="MKV 输出目录..." Margin="8,0,8,0"/>
-                                <Button x:Name="BtnBrowseOutput" Grid.Column="2" Content="📂 浏览" Click="OnBrowseOutput"/>
-                                <Button x:Name="BtnAutoOutput" Grid.Column="3" Content="🪄 自动" Margin="4,0,0,0" Click="OnAutoOutput"/>
-                            </Grid>
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                <TextBlock Text=" " VerticalAlignment="Center"/>
-                                <Button x:Name="BtnScan" Grid.Column="1" Content="🔍 扫描工作区"
-                                        Style="{StaticResource AccentButtonStyle}" MinWidth="130" MinHeight="36" Click="OnScanWorkspace"/>
-                                <TextBlock x:Name="ScanStatus" Grid.Column="2" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="12"
-                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
-                            </Grid>
-                        </StackPanel>
-                    </controls:Expander>
-
-                    <controls:Expander Header="🎬 剧集列表" IsExpanded="True"
-                                       Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="6">
-                        <Grid Margin="0,8,0,8">
-                            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="250"/></Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="16,0,16,8" Spacing="8">
-                                <Button x:Name="BtnSelectAll" Content="全选" FontSize="12" Click="OnSelectAll"/>
-                                <Button x:Name="BtnDeselectAll" Content="取消全选" FontSize="12" Click="OnDeselectAll"/>
-                                <TextBlock x:Name="EpisodeCount" VerticalAlignment="Center" FontSize="12"
-                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        <Button x:Name="BtnGoSettingsHint"
+                                MinHeight="36"
+                                MinWidth="200"
+                                FontSize="14"
+                                Style="{StaticResource AccentButtonStyle}"
+                                HorizontalAlignment="Center"
+                                Visibility="Collapsed"
+                                Click="OnGoSettings">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="8">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                            Glyph="&#xE713;"
+                                              FontSize="14"/>
+                                    <TextBlock Text="前往设置页配置工具"
+                                            FontSize="14"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <!-- 单文件转换 -->
+                        <Border Margin="0,20,0,0"
+                                Padding="16"
+                                Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                CornerRadius="8"
+                                MaxWidth="550">
+                            <StackPanel Spacing="10">
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                            Glyph="&#xE72C;"
+                                              FontSize="14"
+                                            VerticalAlignment="Center"/>
+                                    <TextBlock Text="快速转换（单文件）"
+                                               FontSize="14"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="MP4:"
+                                               Width="45"
+                                               VerticalAlignment="Center"
+                                               FontSize="12"/>
+                                    <TextBox x:Name="ConvertMp4Box"
+                                             Grid.Column="1"
+                                             PlaceholderText="选择视频文件..."
+                                             FontSize="12"
+                                             IsReadOnly="True"/>
+                                    <Button Grid.Column="2"
+                                            MinWidth="34"
+                                            Margin="4,0,0,0"
+                                            Click="OnPickConvertMp4">
+                                        <Button.Content>
+                                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                                      Glyph="&#xE8B7;"
+                                                    FontSize="14"/>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="M4A:"
+                                               Width="45"
+                                               VerticalAlignment="Center"
+                                               FontSize="12"/>
+                                    <TextBox x:Name="ConvertM4aBox"
+                                             Grid.Column="1"
+                                             PlaceholderText="选择音频文件..."
+                                             FontSize="12"
+                                             IsReadOnly="True"/>
+                                    <Button Grid.Column="2"
+                                            MinWidth="34"
+                                            Margin="4,0,0,0"
+                                            Click="OnPickConvertM4a">
+                                        <Button.Content>
+                                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                                      Glyph="&#xE8B7;"
+                                                    FontSize="14"/>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="字幕:"
+                                               Width="45"
+                                               VerticalAlignment="Center"
+                                               FontSize="12"/>
+                                    <TextBox x:Name="ConvertJsonBox"
+                                             Grid.Column="1"
+                                             PlaceholderText="JSON字幕（可选）..."
+                                             FontSize="12"
+                                             IsReadOnly="True"/>
+                                    <Button Grid.Column="2"
+                                            MinWidth="34"
+                                            Margin="4,0,0,0"
+                                            Click="OnPickConvertJson">
+                                        <Button.Content>
+                                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                                      Glyph="&#xE8B7;"
+                                                    FontSize="14"/>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="输出:"
+                                               Width="45"
+                                               VerticalAlignment="Center"
+                                               FontSize="12"/>
+                                    <TextBox x:Name="ConvertOutBox"
+                                             Grid.Column="1"
+                                             PlaceholderText="自动生成..."
+                                             FontSize="12"/>
+                                    <Button Grid.Column="2"
+                                            MinWidth="34"
+                                            Margin="4,0,0,0"
+                                            Click="OnPickConvertOut">
+                                        <Button.Content>
+                                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                                      Glyph="&#xE8B7;"
+                                                    FontSize="14"/>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="8"
+                                            Margin="0,4,0,0">
+                                    <Button x:Name="BtnConvertStart"
+                                            Style="{StaticResource AccentButtonStyle}"
+                                            MinHeight="32"
+                                            FontSize="13"
+                                            Click="OnConvertStart">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal"
+                                                    Spacing="6">
+                                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                                          Glyph="&#xE945;"
+                                                        FontSize="14"/>
+                                                <TextBlock Text="开始转换"
+                                                        FontSize="13"
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <TextBlock x:Name="ConvertStatus"
+                                               FontSize="11"
+                                               VerticalAlignment="Center"
+                                               TextWrapping="Wrap"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                </StackPanel>
                             </StackPanel>
-                            <ScrollViewer Grid.Row="1" Margin="16,0,16,8" VerticalScrollBarVisibility="Auto">
-                                <StackPanel x:Name="EpisodePanel"/>
-                            </ScrollViewer>
-                        </Grid>
-                    </controls:Expander>
-
-                    <Grid Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="6" Padding="20">
-                        <StackPanel Spacing="12">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button x:Name="BtnStart" Content="🚀 开始合并"
-                                        Style="{StaticResource AccentButtonStyle}"
-                                        MinWidth="140" MinHeight="40" FontSize="14" FontWeight="SemiBold"
-                                        IsEnabled="False" Click="OnStartMux"/>
-                                <Button x:Name="BtnCancel" Content="⏹ 取消"
-                                        MinWidth="100" MinHeight="40" IsEnabled="False" Click="OnCancelMux"/>
-                            </StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                                <ProgressBar x:Name="MuxProgress" Grid.Column="0" Minimum="0" Maximum="100" Value="0" Height="6" CornerRadius="3"/>
-                                <TextBlock x:Name="ProgressPercent" Grid.Column="1" Text="0%" Margin="12,0,0,0"
-                                           VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold"/>
-                            </Grid>
-                            <TextBlock x:Name="StatusText" Text="就绪" FontSize="12"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" TextWrapping="Wrap"/>
-                        </StackPanel>
-                    </Grid>
-                </StackPanel>
-            </ScrollViewer>
-
-            <!-- ── 日志页面 ── -->
-            <Grid x:Name="LogsPage" Visibility="Collapsed">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <Grid Grid.Row="0" Margin="24,16,24,8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="📄 程序日志" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                        <Button x:Name="BtnRefreshLog" Content="🔄 刷新" Click="OnRefreshLog"/>
-                        <Button x:Name="BtnExportLog" Content="📤 导出" Click="OnExportLog"/>
-                        <Button x:Name="BtnOpenLogDir" Content="📂 打开目录" Click="OnOpenLogDir"/>
-                        <Button x:Name="BtnClearLog" Content="🗑 清空" Click="OnClearLog"/>
+                        </Border>
                     </StackPanel>
                 </Grid>
 
-                <ScrollViewer Grid.Row="1" Margin="24,0,24,24" VerticalScrollBarVisibility="Auto"
-                              Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}" CornerRadius="6">
-                    <TextBlock x:Name="LogContent" Margin="16" FontSize="11"
-                               FontFamily="Consolas" TextWrapping="Wrap" IsTextSelectionEnabled="True"
-                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                               Text="暂无日志..."/>
+                <!-- ═══ 工作区 ═══ -->
+                <Grid x:Name="WorkspacePage"
+                      Margin="12"
+                      Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 卡片：工作区设置 -->
+                    <Border Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="4"
+                            Padding="14"
+                            Background="{ThemeResource CardBackgroundFillColorDefault}"
+                            CornerRadius="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="工作区"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,8"/>
+                            <StackPanel Grid.Row="1"
+                                        Spacing="8"
+                                        VerticalAlignment="Top">
+                                <TextBlock Text="输入目录:"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="InputDirBox"
+                                             PlaceholderText="包含 MP4/M4A 的文件夹..."
+                                             FontSize="12"/>
+                                    <Button Grid.Column="1"
+                                            Margin="4,0,0,0"
+                                            Click="OnBrowseInput">
+                                        <Button.Content>
+                                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                                      Glyph="&#xE8B7;"
+                                                    FontSize="14"/>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                                <TextBlock Text="输出目录:"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Margin="0,4,0,0"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="OutputDirBox"
+                                             PlaceholderText="MKV 输出目录..."
+                                             FontSize="12"/>
+                                    <Button Grid.Column="1"
+                                            Margin="4,0,0,0"
+                                            Click="OnBrowseOutput">
+                                        <Button.Content>
+                                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                                      Glyph="&#xE8B7;"
+                                                    FontSize="14"/>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Grid.Column="2"
+                                            Margin="4,0,0,0"
+                                            ToolTipService.ToolTip="自动生成输出路径"
+                                            Click="OnAutoOutput">
+                                        <Button.Content>
+                                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                                      Glyph="&#xE945;"
+                                                    FontSize="14"/>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                                <Button x:Name="BtnScan"
+                                        Style="{StaticResource AccentButtonStyle}"
+                                        MinHeight="32"
+                                        Click="OnScanWorkspace">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal"
+                                                Spacing="6">
+                                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                                      Glyph="&#xE721;"
+                                                    FontSize="14"/>
+                                            <TextBlock Text="扫描工作区"
+                                                    FontSize="13"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                                <TextBlock x:Name="ScanStatus"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- 卡片：剧集列表 -->
+                    <Border Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="4"
+                            Padding="14"
+                            Background="{ThemeResource CardBackgroundFillColorDefault}"
+                            CornerRadius="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="剧集列表"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            Spacing="4">
+                                    <TextBlock x:Name="EpisodeCount"
+                                               FontSize="11"
+                                               VerticalAlignment="Center"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                    <Button Content="全选"
+                                            FontSize="11"
+                                            Click="OnSelectAll"/>
+                                    <Button Content="取消"
+                                            FontSize="11"
+                                            Click="OnDeselectAll"/>
+                                </StackPanel>
+                            </Grid>
+                            <ScrollViewer Grid.Row="1"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Margin="0,4,0,0">
+                                <StackPanel x:Name="EpisodePanel"/>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+
+                    <!-- 卡片：合并 -->
+                    <Border Grid.Row="0"
+                            Grid.Column="1"
+                            Grid.RowSpan="2"
+                            Margin="4"
+                            Padding="14"
+                            Background="{ThemeResource CardBackgroundFillColorDefault}"
+                            CornerRadius="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0"
+                                        Spacing="6">
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                            Glyph="&#xE7F8;"
+                                              FontSize="14"
+                                            VerticalAlignment="Center"/>
+                                    <TextBlock Text="合并"
+                                               FontSize="14"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="6">
+                                    <Button x:Name="BtnStart"
+                                            Style="{StaticResource AccentButtonStyle}"
+                                            MinHeight="32"
+                                            IsEnabled="False"
+                                            Click="OnStartMux">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal"
+                                                    Spacing="6">
+                                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                                          Glyph="&#xE7F8;"
+                                                        FontSize="14"/>
+                                                <TextBlock Text="开始合并"
+                                                        FontSize="13"
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button x:Name="BtnCancel"
+                                            MinHeight="32"
+                                            IsEnabled="False"
+                                            Click="OnCancelMux">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal"
+                                                    Spacing="6">
+                                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                                          Glyph="&#xE71B;"
+                                                        FontSize="14"/>
+                                                <TextBlock Text="取消"
+                                                        FontSize="13"
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                </StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ProgressBar x:Name="MuxProgress"
+                                                 Minimum="0"
+                                                 Maximum="100"
+                                                 Value="0"
+                                                 Height="4"
+                                                 CornerRadius="2"
+                                                 VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="ProgressPercent"
+                                               Grid.Column="1"
+                                               Text="0%"
+                                               Margin="6,0,0,0"
+                                               FontSize="11"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+                            <ScrollViewer Grid.Row="1"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Margin="0,4,0,0"
+                                          Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
+                                          CornerRadius="4">
+                                <RichTextBlock x:Name="MuxLog"
+                                               Margin="8"
+                                               FontSize="11"
+                                               FontFamily="Consolas"
+                                               IsTextSelectionEnabled="True"/>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- ═══ 帮助 ═══ -->
+                <ScrollViewer x:Name="HelperPage"
+                              Visibility="Collapsed">
+                    <StackPanel Margin="24,16"
+                                Spacing="16"
+                                MaxWidth="700">
+                        <TextBlock Text="帮助"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"/>
+
+                        <Border Padding="20"
+                                Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                CornerRadius="8">
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                            Glyph="&#xE897;"
+                                              FontSize="16"
+                                            VerticalAlignment="Center"/>
+                                    <TextBlock Text="使用说明"
+                                               FontSize="16"
+                                            FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="1. 确保 FFmpeg 已安装（设置页可自动检测）"
+                                           FontSize="13"
+                                        TextWrapping="Wrap"/>
+                                <TextBlock Text="2. 在工作区页面选择包含 MP4/M4A 的文件夹"
+                                           FontSize="13"
+                                        TextWrapping="Wrap"/>
+                                <TextBlock Text="3. 点击「扫描工作区」自动匹配 MP4 + M4A + JSON"
+                                           FontSize="13"
+                                        TextWrapping="Wrap"/>
+                                <TextBlock Text="4. 勾选要合并的剧集，点击「开始合并」"
+                                           FontSize="13"
+                                        TextWrapping="Wrap"/>
+                                <TextBlock Text="5. 输出目录默认为 输入目录/MKV/"
+                                           FontSize="13"
+                                        TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Padding="20"
+                                Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                CornerRadius="8">
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                            Glyph="&#xE946;"
+                                              FontSize="16"
+                                            VerticalAlignment="Center"/>
+                                    <TextBlock Text="文件命名规则"
+                                               FontSize="16"
+                                            FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="按文件名（不含扩展名）自动匹配："
+                                           FontSize="13"
+                                        TextWrapping="Wrap"/>
+                                <TextBlock Text="  • 第01集.mp4 + 第01集.m4a + 第01集.json → 第01集.mkv"
+                                           FontSize="12"
+                                        FontFamily="Consolas"
+                                           TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <TextBlock Text="  • video.mp4 + video(m4a).m4a → video.mkv"
+                                           FontSize="12"
+                                        FontFamily="Consolas"
+                                           TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <TextBlock Text="M4A 文件支持括号后缀，如 xxx(m4a).m4a 会匹配 xxx.mp4"
+                                           FontSize="13"
+                                        TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Padding="20"
+                                Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                CornerRadius="8">
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                            Glyph="&#xE783;"
+                                              FontSize="16"
+                                            VerticalAlignment="Center"/>
+                                    <TextBlock Text="常见问题"
+                                               FontSize="16"
+                                            FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="Q: 提示「未找到 FFmpeg」？"
+                                           FontSize="13"
+                                        FontWeight="SemiBold"/>
+                                <TextBlock Text="A: 到设置页点击「检测」自动查找，或手动浏览选择 ffmpeg.exe"
+                                           FontSize="13"
+                                        TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <TextBlock Text="Q: 扫描不到剧集？"
+                                           FontSize="13"
+                                        FontWeight="SemiBold"
+                                        Margin="0,8,0,0"/>
+                                <TextBlock Text="A: 确保同名的 MP4 和 M4A 文件在同一目录下"
+                                           FontSize="13"
+                                        TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                <TextBlock Text="Q: 合成失败？"
+                                           FontSize="13"
+                                        FontWeight="SemiBold"
+                                        Margin="0,8,0,0"/>
+                                <TextBlock Text="A: 查看日志页或工作区的合并日志，常见原因：文件损坏、编码不兼容"
+                                           FontSize="13"
+                                        TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
                 </ScrollViewer>
+
+                <!-- ═══ 设置 ═══ -->
+                <ScrollViewer x:Name="SettingsPage"
+                              Visibility="Collapsed">
+                    <StackPanel Margin="24,16"
+                                Spacing="16"
+                                MaxWidth="700">
+                        <TextBlock Text="设置"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"/>
+
+                        <!-- 工具路径 -->
+                        <Border Padding="20"
+                                Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                CornerRadius="8">
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                            Glyph="&#xE713;"
+                                              FontSize="16"
+                                            VerticalAlignment="Center"/>
+                                    <TextBlock Text="工具路径"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="FFmpeg"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="FFmpegPathBox"
+                                             PlaceholderText="FFmpeg 路径..."
+                                             FontSize="12"/>
+                                    <StackPanel Grid.Column="1"
+                                                Orientation="Horizontal"
+                                                Spacing="4"
+                                                Margin="4,0,0,0">
+                                        <Button x:Name="BtnDetectFFmpeg"
+                                                FontSize="11"
+                                                Click="OnDetectFFmpeg">
+                                            <Button.Content>
+                                                <StackPanel Orientation="Horizontal"
+                                                        Spacing="4">
+                                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                                              Glyph="&#xE721;"
+                                                            FontSize="12"/>
+                                                    <TextBlock Text="检测"
+                                                            FontSize="11"
+                                                               VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button.Content>
+                                        </Button>
+                                        <Button x:Name="BtnDeepDetectFFmpeg"
+                                                FontSize="11"
+                                                Click="OnDeepDetectFFmpeg"
+                                                Visibility="Collapsed">
+                                            <Button.Content>
+                                                <StackPanel Orientation="Horizontal"
+                                                        Spacing="4">
+                                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                                              Glyph="&#xE721;"
+                                                            FontSize="12"/>
+                                                    <TextBlock Text="深层"
+                                                            FontSize="11"
+                                                               VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button.Content>
+                                        </Button>
+                                        <Button x:Name="BtnInstallFFmpeg"
+                                                FontSize="11"
+                                                Click="OnInstallFFmpeg"
+                                                Visibility="Collapsed">
+                                            <Button.Content>
+                                                <StackPanel Orientation="Horizontal"
+                                                        Spacing="4">
+                                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                                              Glyph="&#xE896;"
+                                                            FontSize="12"/>
+                                                    <TextBlock Text="安装"
+                                                            FontSize="11"
+                                                               VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button.Content>
+                                        </Button>
+                                        <Button x:Name="BtnBrowseFFmpeg"
+                                                MinWidth="34"
+                                                Click="OnBrowseFFmpeg">
+                                            <Button.Content>
+                                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                                          Glyph="&#xE8B7;"
+                                                        FontSize="14"/>
+                                            </Button.Content>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                                <TextBlock x:Name="FFmpegStatus"
+                                           FontSize="11"
+                                           TextWrapping="Wrap"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 后端端口 -->
+                        <Border Padding="20"
+                                Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                CornerRadius="8">
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                            Glyph="&#xE704;"
+                                              FontSize="16"
+                                            VerticalAlignment="Center"/>
+                                    <TextBlock Text="后端端口"
+                                               FontSize="16"
+                                            FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <RadioButton x:Name="RbPortRandom"
+                                             Content="随机端口（推荐）"
+                                             GroupName="PortMode"
+                                        IsChecked="True"
+                                             Checked="OnPortModeChanged"/>
+                                <RadioButton x:Name="RbPortManual"
+                                             Content="手动指定"
+                                             GroupName="PortMode"
+                                             Checked="OnPortModeChanged"/>
+                                <TextBox x:Name="ManualPortBox"
+                                         PlaceholderText="输入端口号 (1024-65535)..."
+                                         FontSize="12"
+                                        Visibility="Collapsed"
+                                         InputScope="Number"
+                                         TextChanged="OnManualPortTextChanged"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 界面选项 -->
+                        <Border Padding="20"
+                                Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                CornerRadius="8">
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                            Glyph="&#xE7C0;"
+                                              FontSize="16"
+                                            VerticalAlignment="Center"/>
+                                    <TextBlock Text="界面选项"
+                                               FontSize="16"
+                                            FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <ToggleSwitch x:Name="TglShowLogs"
+                                              Header="显示日志选项卡"
+                                              OffContent="日志选项卡已隐藏"
+                                              OnContent="日志选项卡已显示"
+                                              IsOn="False"
+                                              Toggled="OnShowLogsToggled"/>
+                                <ToggleSwitch x:Name="TglShowHelper"
+                                              Header="启动时显示新手指引"
+                                              OffContent="首次启动弹窗已关闭"
+                                              OnContent="首次启动弹窗已开启"
+                                              IsOn="True"
+                                              Toggled="OnShowHelperToggled"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 退出行为 -->
+                        <Border Padding="20"
+                                Background="{ThemeResource CardBackgroundFillColorDefault}"
+                                CornerRadius="8">
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="6">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                            Glyph="&#xE8D7;"
+                                              FontSize="16"
+                                            VerticalAlignment="Center"/>
+                                    <TextBlock Text="关闭窗口行为"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <RadioButton x:Name="RbExitAsk"
+                                             Content="每次询问"
+                                             GroupName="ExitBehavior"
+                                             Checked="OnExitBehaviorChanged"/>
+                                <RadioButton x:Name="RbExitTray"
+                                             Content="最小化到托盘"
+                                             GroupName="ExitBehavior"
+                                             Checked="OnExitBehaviorChanged"/>
+                                <RadioButton x:Name="RbExitClose"
+                                             Content="直接退出"
+                                             GroupName="ExitBehavior"
+                                             Checked="OnExitBehaviorChanged"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ═══ 日志页 ═══ -->
+                <Grid x:Name="LogsPage"
+                      Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0"
+                                Margin="24,16,24,8"
+                                Orientation="Horizontal"
+                                Spacing="8">
+                        <StackPanel Orientation="Horizontal"
+                                Spacing="6"
+                                    VerticalAlignment="Center">
+                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                    Glyph="&#xE8A5;"
+                                      FontSize="16"
+                                    VerticalAlignment="Center"/>
+                            <TextBlock Text="日志"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button x:Name="BtnRefreshLog"
+                                Click="OnRefreshLog">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="4">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                              Glyph="&#xE72C;"
+                                            FontSize="12"/>
+                                    <TextBlock Text="刷新"
+                                            FontSize="12"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="BtnExportLog"
+                                Click="OnExportLog">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="4">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                              Glyph="&#xE898;"
+                                            FontSize="12"/>
+                                    <TextBlock Text="导出"
+                                            FontSize="12"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="BtnOpenLogDir"
+                                Click="OnOpenLogDir">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="4">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                              Glyph="&#xE8B7;"
+                                            FontSize="12"/>
+                                    <TextBlock Text="打开"
+                                            FontSize="12"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="BtnClearLog"
+                                Click="OnClearLog">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal"
+                                        Spacing="4">
+                                    <FontIcon FontFamily="Segoe Fluent Icons"
+                                              Glyph="&#xE74D;"
+                                            FontSize="12"/>
+                                    <TextBlock Text="清空"
+                                            FontSize="12"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+                    <ScrollViewer Grid.Row="1"
+                                  Margin="24,0,24,24"
+                                  Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+                                  CornerRadius="6">
+                        <RichTextBlock x:Name="LogContent"
+                                Margin="16"
+                                FontSize="11"
+                                FontFamily="Consolas"
+                                IsTextSelectionEnabled="True"
+                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                    </ScrollViewer>
+                </Grid>
             </Grid>
-            </Grid> <!-- 页面容器结束 -->
         </controls:NavigationView>
+
+        <!-- 状态栏 -->
+        <Border Grid.Row="2"
+                Padding="8,4"
+                Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal"
+                        Spacing="4"
+                            VerticalAlignment="Center">
+                    <Border CornerRadius="2"
+                            Padding="2,1"
+                            x:Name="BackendStatusDot"
+                            Background="Gray"
+                            Width="8"
+                            Height="8"
+                            VerticalAlignment="Center"/>
+                    <TextBlock x:Name="BackendStatusLabel"
+                               Text="后端"
+                               FontSize="11"
+                            VerticalAlignment="Center"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                    <TextBlock x:Name="BackendPortText"
+                               Text=":0"
+                               FontSize="11"
+                            Margin="4,0"
+                            VerticalAlignment="Center"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                    <HyperlinkButton x:Name="BtnReconnectBackend"
+                                     FontSize="10"
+                            Padding="4,0"
+                            Margin="2,0,0,0"
+                                     Visibility="Collapsed"
+                                     Click="OnReconnectBackend">
+                        <HyperlinkButton.Content>
+                            <StackPanel Orientation="Horizontal"
+                                    Spacing="4">
+                                <FontIcon FontFamily="Segoe Fluent Icons"
+                                          Glyph="&#xE72C;"
+                                        FontSize="10"/>
+                                <TextBlock Text="重连"
+                                        FontSize="10"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </HyperlinkButton.Content>
+                    </HyperlinkButton>
+                </StackPanel>
+                <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                    <FontIcon x:Name="StatusIcon"
+                              FontFamily="Segoe Fluent Icons"
+                              Glyph="&#xE73E;"
+                              FontSize="11"
+                              Margin="0,0,4,0"
+                              Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                              VerticalAlignment="Center"/>
+                    <TextBlock x:Name="StatusText"
+                               Text="Rust HTTP Server 就绪"
+                               FontSize="11"
+                               TextTrimming="CharacterEllipsis"
+                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 托盘图标 (H.NotifyIcon) -->
+        <tb:TaskbarIcon
+            x:Name="TrayIcon"
+            ContextMenuMode="SecondWindow"
+            NoLeftClickDelay="True"
+            ToolTipText="3m_tool">
+            <tb:TaskbarIcon.ContextFlyout>
+                <MenuFlyout>
+                    <MenuFlyoutItem Text="首页"
+                            Click="OnTrayHome">
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                    Glyph="&#xE80F;"/>
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+                    <MenuFlyoutItem Text="工作区"
+                            Click="OnTrayWorkspace"/>
+                    <MenuFlyoutItem Text="设置"
+                            Click="OnTraySettings"/>
+                    <MenuFlyoutSeparator/>
+                    <MenuFlyoutItem Text="退出"
+                            Click="OnTrayExit">
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                    Glyph="&#xE711;"/>
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+                </MenuFlyout>
+            </tb:TaskbarIcon.ContextFlyout>
+        </tb:TaskbarIcon>
     </Grid>
 </Window>

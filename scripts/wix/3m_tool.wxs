@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define ProductName="3m_tool" ?>
+  <?define Manufacturer="Mizauka" ?>
+  <?define UpgradeCode="A1B2C3D4-E5F6-7890-ABCD-EF1234567890" ?>
+
+  <Product Id="*"
+           Name="$(var.ProductName) ($(var.Platform))"
+           Language="2052"
+           Version="1.0.0"
+           Manufacturer="$(var.Manufacturer)"
+           UpgradeCode="$(var.UpgradeCode)">
+    <Package InstallerVersion="500"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Platform="$(var.Platform)"
+             Description="MP4+M4A+JSON→MKV 合并工具 $(var.Platform)" />
+
+    <MajorUpgrade DowngradeErrorMessage="已安装更新版本" />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder" Platform="x64">
+        <Directory Id="INSTALLFOLDER" Name="3m_tool">
+          <Component Id="AppFiles" Guid="*" Win64="yes">
+            <File Id="MainExe" Source="$(var.PublishDir)\ThreeMGui.exe" KeyPath="yes" />
+            <File Id="CoreExe" Source="$(var.PublishDir)\m3_core.exe" />
+            <!-- Harvest all other files -->
+            <CreateFolder />
+          </Component>
+          <Component Id="AppDataDir" Guid="*" Win64="yes">
+            <CreateFolder Directory="APPDATADIR" />
+            <RemoveFolder Id="RemoveAppData" Directory="APPDATADIR" On="uninstall" />
+          </Component>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramFiles64Folder" Name="PFiles">
+        <!-- WiX doesn't have ProgramFiles on ARM, use system folder -->
+      </Directory>
+
+      <!-- Start Menu Shortcut -->
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="AppProgramMenuFolder" Name="3m_tool" />
+      </Directory>
+    </Directory>
+
+    <DirectoryRef Id="AppProgramMenuFolder">
+      <Component Id="StartMenuShortcut" Guid="*" Win64="yes">
+        <Shortcut Id="StartMenuLink"
+                  Name="3m_tool Mosaic MKV Muxer"
+                  Target="[INSTALLFOLDER]ThreeMGui.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue Root="HKCU"
+                       Key="Software\3m_tool"
+                       Name="installed"
+                       Type="integer" Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <Feature Id="Complete" Title="3m_tool" Level="1">
+      <ComponentGroupRef Id="HarvestedFiles" />
+      <ComponentRef Id="StartMenuShortcut" />
+    </Feature>
+
+    <!-- Auto-generated from publish folder -->
+    <DirectoryRef Id="INSTALLFOLDER">
+      <ComponentGroup Id="HarvestedFiles">
+        <Component Id="AppMain" Guid="*" Win64="yes">
+          <File Id="GuiExe" Source="$(var.PublishDir)\ThreeMGui.exe" />
+          <File Id="BackendExe" Source="$(var.PublishDir)\m3_core.exe" />
+        </Component>
+      </ComponentGroup>
+    </DirectoryRef>
+  </Product>
+</Wix>

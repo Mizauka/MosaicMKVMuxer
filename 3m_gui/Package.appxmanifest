@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
@@ -15,7 +15,7 @@
   <mp:PhoneIdentity PhoneProductId="b3d7690b-e605-471a-9153-c4300226fa4e" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>3m_gui</DisplayName>
+    <DisplayName>3m_tool</DisplayName>
     <PublisherDisplayName>Mizauka</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -35,12 +35,13 @@
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
         DisplayName="3mtool Mosaic MKV Muxer"
-        Description="MP4+M4A+JSON→MKV 合并工具"
+        Description="MP4+M4A+JSON to MKV merger"
         BackgroundColor="transparent"
-        Square150x150Logo="Assets\Square150x150Logo.scale-200.png"
-        Square44x44Logo="Assets\Square44x44Logo.scale-200.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.scale-200.png" />
-        <uap:SplashScreen Image="Assets\SplashScreen.scale-200.png" />
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png" ShortName="3mtool">
+        </uap:DefaultTile>
+        <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
     </Application>
   </Applications>
